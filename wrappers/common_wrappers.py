@@ -185,7 +185,7 @@ class VectorObservationWrapper(ObsWrapper):
             if 'target_grid' in info:
                 target_grid = self.env.task.target_grid
             else:
-                logger.error(f'info: {info}')
+                #logger.error(f'info: {info}')
                 if hasattr(self.unwrapped, 'should_reset'):
                     self.unwrapped.should_reset(True)
                 target_grid = self.env.task.target_grid
