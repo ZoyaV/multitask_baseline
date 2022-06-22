@@ -41,7 +41,7 @@ class TargetGenerator(gym.Wrapper):
             X, Y = np.where(relief != 0)
         print("++++++++++++++++++")
         print()
-        print(self.figure.figure_parametrs['name'])
+      #  print(self.figure.figure_parametrs['name'])
         print()
         print("++++++++++++++++++")
         #print("generated")
@@ -57,7 +57,7 @@ class SubtaskGenerator(gym.Wrapper):
         self.old_grid = np.zeros((9, 11, 11))
         self.preinited_grid = None
         self.old_preinited_grid = None
-        self.prebuilds_percent = 0.5
+        self.prebuilds_percent = 0.9
         self.last_agent_rotation = (0, 0)
         self.last_target = None
         self.color_map = None
