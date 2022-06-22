@@ -4,7 +4,7 @@ import os
 import gym
 import numpy as np
 
-from gridworld.task import Task
+from gridworld.tasks.task import Task
 from wrappers.target_generator import RandomFigure, Figure, target_to_subtasks
 
 logger = logging.getLogger(__file__)
@@ -31,14 +31,20 @@ class TargetGenerator(gym.Wrapper):
     def reset(self):
         X = []
         self.figure.make_task()
-        if self.figure.use_color:
+        if isinstance(self.figure, RandomFigure):
             min_block_in_fig = 10
         else:
-            min_block_in_fig = 10
+            min_block_in_fig = 0
         while len(X) <= min_block_in_fig:
             self.figure.make_task()
             relief = self.figure.figure_parametrs['relief']
             X, Y = np.where(relief != 0)
+        print("++++++++++++++++++")
+        print()
+        print(self.figure.figure_parametrs['name'])
+        print()
+        print("++++++++++++++++++")
+        #print("generated")
         return super().reset()
 
 
