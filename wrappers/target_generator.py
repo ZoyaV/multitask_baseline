@@ -8,7 +8,7 @@ def target_to_subtasks(figure):
     targets_plane = figure.relief.astype(int)
     color_plane = figure.figure_parametrs['color']
     X, Y = np.where(figure.relief != 0)
-    addtional_tower_remote = (2, 2)
+    addtional_tower_remote = (1, 1)
     #generate main blocks
     for x, y in zip(X, Y):
         for z in range(targets_plane[x, y]):
