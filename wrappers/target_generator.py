@@ -8,7 +8,7 @@ def target_to_subtasks(figure):
     targets_plane = figure.relief.astype(int)
     color_plane = figure.figure_parametrs['color']
     X, Y = np.where(figure.relief != 0)
-    addtional_tower_remote = (1, 1)
+    addtional_tower_remote = (2, 2)
     #generate main blocks
     for x, y in zip(X, Y):
         for z in range(targets_plane[x, y]):
@@ -198,6 +198,11 @@ class DatasetFigure(Figure):
             figure_ = self.augmented_targets[idx]
             rp = 1  # is figure right predicted
 
+        new_figure = np.zeros_like(figure_)
+        new_figure[:,1:,1:] = figure_[:,:-1,:-1]
+        figure_ = new_figure.copy()
+        print("generated first level")
+        print(figure_[0,:,:])
         figure = self.to_multitask_format(figure_)
         self.figure_parametrs['name'] = name
         self.figure_parametrs['original'] = original
