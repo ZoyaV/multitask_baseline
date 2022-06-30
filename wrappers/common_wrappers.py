@@ -137,6 +137,7 @@ class JumpAfterPlace(ActionsWrapper):
         if (action > self.act_space[0]) and (action < self.act_space[1]) > 0:
             yield action
             yield 5
+            yield 5
         else:
             yield action
 
