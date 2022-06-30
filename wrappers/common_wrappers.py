@@ -128,15 +128,15 @@ class Discretization(ActionsWrapper):
 
 class JumpAfterPlace(ActionsWrapper):
     def __init__(self, env):
-        min_inventory_value = 10
-        max_inventory_value = 17
+        min_inventory_value = 5
+        max_inventory_value = 12
         self.act_space = (min_inventory_value, max_inventory_value)
         super().__init__(env)
 
     def wrap_action(self, action=None):
         if (action > self.act_space[0]) and (action < self.act_space[1]) > 0:
             yield action
-            yield 6
+            yield 5
         else:
             yield action
 
@@ -144,8 +144,8 @@ class JumpAfterPlace(ActionsWrapper):
 class ColorWrapper(ActionsWrapper):
     def __init__(self, env):
         super().__init__(env)
-        min_inventory_value = 10
-        max_inventory_value = 17
+        min_inventory_value = 5
+        max_inventory_value = 12
         self.color_space = (min_inventory_value, max_inventory_value)
 
     def wrap_action(self, action=None):
