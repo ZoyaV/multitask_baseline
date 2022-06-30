@@ -44,7 +44,7 @@ def make_iglu(*args, **kwargs):
     env = SubtaskGenerator(env)
     env = VectorObservationWrapper(env)
    # env = Discretization(env, flat_action_space('human-level'))
-    #env = JumpAfterPlace(env)
+    env = JumpAfterPlace(env)
     env = RangetRewardFilledField(env)
     env = Closeness(env)
    #  # env = SuccessRateWrapper(env)
