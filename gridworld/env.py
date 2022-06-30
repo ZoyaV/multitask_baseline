@@ -268,12 +268,14 @@ class GridWorld(Env):
         if self.vector_state:
             obs['grid'] = self.grid.copy().astype(np.int32)
             obs['agentPos'] = np.array([x, y, z, pitch, yaw], dtype=np.float32)
-        right_placement, wrong_placement, done = self._task.step_intersection(self.grid)
-        done = done or (self.step_no == self.max_steps)
-        if right_placement == 0:
-            reward = wrong_placement * self.wrong_placement_scale
-        else:
-            reward = right_placement * self.right_placement_scale
+      #  right_placement, wrong_placement, done = self._task.step_intersection(self.grid)
+       # done = done or (self.step_no == self.max_steps)
+        done = False
+        reward = 0
+        # if right_placement == 0:
+        #     reward = wrong_placement * self.wrong_placement_scale
+        # else:
+        #     reward = right_placement * self.right_placement_scale
         if self.target_in_obs:
             obs['target_grid'] = self._task.target_grid.copy().astype(np.int32)
         if self.do_render:
