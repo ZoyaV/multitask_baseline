@@ -146,7 +146,7 @@ class VideoLogger(Wrapper):
             # with open(f'{self.filename}-r{self.running_reward}.json', 'w') as f:
             #  json.dump(self.actions, f)
             self.out.release()
-            os.rename(f'{self.filename}.mp4', f'{self.filename}_{self.add_to_name}_{self.env.name}.mp4')
+            os.rename(f'{self.filename}.mp4', f'{self.filename}_{self.add_to_name}_{self.env.figure.figure_parametrs["name"] }.mp4')
             # with open(f'{self.filename}-obs.pkl', 'wb') as f:
             # pickle.dump(self.obs, f)
             self.obs = []
@@ -251,7 +251,7 @@ class Logger(Wrapper):
     def __init__(self, env):
         super().__init__(env)
         runtime = timestamp = datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
-        self.dirname = f'action_logs/run-{runtime}'
+        self.dirname = f'action_logss/run-{runtime}'
         self.filename = None
         self.running_reward = 0
         self.actions = []
@@ -260,11 +260,12 @@ class Logger(Wrapper):
 
     def flush(self):
         if self.filename is not None:
-            with open(f'{self.filename}-act.pkl', 'wb') as f:
+            with open(f'{self.filename}-{self.env.figure.figure_parametrs["name"]}-act.pkl', 'wb') as f:
                 pickle.dump(self.actions, f)
-            with open(f'{self.filename}-obs.pkl', 'wb') as f:
+            with open(f'{self.filename}-{self.env.figure.figure_parametrs["name"]}-obs.pkl', 'wb') as f:
                 pickle.dump(self.obs, f)
             self.obs = []
+
         timestamp = datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
         uid = str(uuid.uuid4().hex)
         name = f'episode-{timestamp}-{uid}'

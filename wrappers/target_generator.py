@@ -26,6 +26,8 @@ def target_to_subtasks(figure):
             last_height = 0
             z = 0
             # generate additional blocks
+            print("Holes^")
+            print(zh[holes_in_xy])
             for height in zh[holes_in_xy]:
                 for z in range(last_height, height):
                     custom_grid = np.zeros((9, 11, 11))
@@ -70,12 +72,23 @@ class Figure():
         figure = np.zeros_like(figure_witn_colors)
         figure[figure_witn_colors > 0] = 1
         self.figure = figure.copy()
-        holes, _ = modify(figure)
+        print("generated first level")
+        print(self.figure[0, :, :])
+      #  holes, _ = modify(figure)
         _, _, full_figure = self.simplify()
+        print("full figure first level")
+
         full_figure[full_figure != 0] = 1
+
+       # ffigure = np.zeros_like(full_figure)
+        #ffigure[:,1:,1:] = full_figure[:,:-1,:-1]
+       # full_figure = ffigure.copy()
+        print(full_figure[0,:,:])
         blocks = np.where((full_figure - self.figure) != 0)
         ind = np.lexsort((blocks[0], blocks[2], blocks[1]))
         self.hole_indx = (blocks[0][ind], blocks[1][ind], blocks[2][ind])
+        print("HOLES")
+        print(self.hole_indx)
         figure_parametrs = {'figure': self.figure, 'color_': figure_witn_colors}
         self.figure_parametrs = figure_parametrs
         return figure
@@ -84,9 +97,23 @@ class Figure():
         if self.figure is not None:
             fig = self.figure.copy()
             is_modified, new_figure = modify(fig)
-            target, relief = figure_to_3drelief(new_figure)
-            full_figure = relief.copy()
+
+            print(self.figure.sum(axis=0))
+
+            target, relief = figure_to_3drelief(self.figure)
+
             relief = relief.max(axis=0)
+            ones = np.ones((11,11)) * np.arange(1,10).reshape(-1,1,1)
+
+            ones[ones <= relief] = 1
+            ones[:, relief == 0] = 0
+            ones[ones > relief] = 0
+
+            print("full figure: \n", ones.sum(axis = 0))
+            print("relief", relief)
+
+            full_figure = ones.copy()
+
             holes = relief - target.sum(axis=0)
             self.relief = relief
             self.simpl_holes = holes
@@ -138,6 +165,7 @@ class RandomFigure(Figure):
 
 
 class DatasetFigure(Figure):
+    main_figure = None
     def __init__(self, path_to_targets='../dialogue/augmented_targets.npy',
                  path_to_names='../dialogue/augmented_target_name.npy',
                  path_to_chats='../dialogue/augmented_chats.npy', generator=True, main_figure=None):
@@ -149,10 +177,13 @@ class DatasetFigure(Figure):
         self.target_predictor = TargetPredictor().cpu()
         if generator:
             self.generator = self.figures_generator()
-        self.main_figure = main_figure
+    #    self.main_figure = main_figure
 
     def load_figure(self, idx, use_dialogue=True):
         name = self.augmented_targets_names[idx]
+      #  print()
+       # print(name)
+     #   print()
         at = self.augmented_targets[idx][:, :, :]
         at[self.augmented_targets[idx] > 0] = 1
         original = self.augmented_targets[idx]
@@ -167,6 +198,11 @@ class DatasetFigure(Figure):
             figure_ = self.augmented_targets[idx]
             rp = 1  # is figure right predicted
 
+      #  new_figure = np.zeros_like(figure_)
+   #     new_figure[:,1:,1:] = figure_[:,:-1,:-1]
+      #  figure_ = new_figure.copy()
+        print("generated first level")
+        print(figure_[0,:,:])
         figure = self.to_multitask_format(figure_)
         self.figure_parametrs['name'] = name
         self.figure_parametrs['original'] = original
