@@ -32,8 +32,8 @@ class Wrapper(gymWrapper):
 class GridWorld(Env):
     def __init__(
             self, render=True, max_steps=250, select_and_place=False,
-            discretize=False, right_placement_scale=5., wrong_placement_scale=0.01,
-            render_size=(64, 64), target_in_obs=False,
+            discretize=False, right_placement_scale=10., wrong_placement_scale=0.01,
+            render_size=(64, 64), target_in_obs=True,
             vector_state=True, name='') -> None:
         self.agent = Agent(sustain=False)
         self.world = World()
@@ -82,9 +82,9 @@ class GridWorld(Env):
                 high=np.array([8, 12, 8, 90, 360], dtype=np.float32),
                 shape=(5,)
             )
-            self.observation_space['grid'] = Box(low=-1, high=7, shape=(9, 11, 11), dtype=np.int32)
+            self.observation_space['grid'] = Box(low=0, high=6, shape=(9, 11, 11), dtype=np.int32)
         if target_in_obs:
-            self.observation_space['target_grid'] = Box(low=-1, high=7, shape=(9, 11, 11), dtype=np.int32)
+            self.observation_space['target_grid'] = Box(low=0, high=6, shape=(9, 11, 11), dtype=np.int32)
         if render:
             self.observation_space['pov'] = Box(low=0, high=255, shape=(*self.render_size, 3), dtype=np.uint8)
         self.observation_space = Dict(self.observation_space)
