@@ -32,7 +32,7 @@ class Wrapper(gymWrapper):
 class GridWorld(Env):
     def __init__(
             self, render=True, max_steps=250, select_and_place=False,
-            discretize=False, right_placement_scale=2., wrong_placement_scale=0.01,
+            discretize=False, right_placement_scale=5., wrong_placement_scale=0.01,
             render_size=(64, 64), target_in_obs=False,
             vector_state=True, name='') -> None:
         self.agent = Agent(sustain=False)
