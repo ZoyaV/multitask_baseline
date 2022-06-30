@@ -47,7 +47,7 @@ def make_iglu(*args, **kwargs):
     env = JumpAfterPlace(env)
     env = RangetRewardFilledField(env)
     env = Closeness(env)
-    # env = SuccessRateWrapper(env)
+   #  # env = SuccessRateWrapper(env)
     env = SuccessRateFullFigure(env)
     env = MultiAgentWrapper(env)
     env = AutoResetWrapper(env)

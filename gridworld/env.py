@@ -72,7 +72,7 @@ class GridWorld(Env):
                 'hotbar': Discrete(7)
             })
         self.observation_space = {
-            'inventory': Box(low=0, high=20, shape=(6,), dtype=np.float32),
+            'inventory': Box(low=0, high=190, shape=(6,), dtype=np.float32),
             'compass': Box(low=-180, high=180, shape=(1,), dtype=np.float32),
             'dialog': String()
         }
@@ -206,7 +206,7 @@ class GridWorld(Env):
         self.agent.rotation = self.initial_rotation
         self.max_int = self._task.maximal_intersection(self.grid)
         self.prev_grid_size = len(self.grid.nonzero()[0])
-        self.agent.inventory = [20 for _ in range(6)]
+        self.agent.inventory = [190 for _ in range(6)]
         if self.starting_grid is not None:
             for _, _, _, color in self.starting_grid:
                 self.agent.inventory[color - 1] -= 1
