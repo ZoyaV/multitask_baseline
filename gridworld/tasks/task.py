@@ -6,9 +6,10 @@ BUILD_ZONE_SIZE = 9, 11, 11
 
 
 class Task:
-    def __init__(self, chat, target_grid, starting_grid=None, full_grid=None, invariant=True):
+    def __init__(self, chat, target_grid, last_instruction=None, starting_grid=None, full_grid=None, invariant=True):
         self.chat = chat
         self.starting_grid = starting_grid
+        self.last_instruction = last_instruction
         self.full_grid = full_grid
         self.admissible = [[] for _ in range(4)]
         self.target_size = (target_grid != 0).sum().item()
@@ -90,6 +91,32 @@ class Task:
         self.right_placement = right_placement
         self.wrong_placement = wrong_placement
         return right_placement, wrong_placement, done
+
+    def argmax_intersection(self, grid):
+        max_int, argmax = 0, (0, 0, 0)
+        for i, admissible in enumerate(self.admissible):
+            for dx, dz in admissible:
+                x_sls = slice(max(dx, 0), BUILD_ZONE_SIZE_X + min(dx, 0))
+                z_sls = slice(max(dz, 0), BUILD_ZONE_SIZE_Z + min(dz, 0))
+                sls_target = self.target_grids[i][:, x_sls, z_sls]
+
+                x_sls = slice(max(-dx, 0), BUILD_ZONE_SIZE_X + min(-dx, 0))
+                z_sls = slice(max(-dz, 0), BUILD_ZONE_SIZE_Z + min(-dz, 0))
+                sls_grid = grid[:, x_sls, z_sls]
+                intersection = ((sls_target == sls_grid) & (sls_target != 0)).sum().item()
+                if intersection > max_int:
+                    max_int = intersection
+                    argmax =(dx, dz, i)
+        return argmax
+
+    def get_intersection(self, grid, dx, dz, rot):
+        x_sls = slice(max(dx, 0), BUILD_ZONE_SIZE_X + min(dx, 0))
+        z_sls = slice(max(dz, 0), BUILD_ZONE_SIZE_Z + min(dz, 0))
+        sls_target = self.target_grids[rot][:, x_sls, z_sls]
+        x_sls = slice(max(-dx, 0), BUILD_ZONE_SIZE_X + min(-dx, 0))
+        z_sls = slice(max(-dz, 0), BUILD_ZONE_SIZE_Z + min(-dz, 0))
+        sls_grid = grid[:, x_sls, z_sls]
+        return ((sls_target == sls_grid) & (sls_target != 0)).sum().item()
 
     def maximal_intersection(self, grid):
         max_int = 0
@@ -218,7 +245,8 @@ class Subtasks(Tasks):
         task = Task(
             dialog, target_grid=self.to_dense(target_grid),
             starting_grid=self.to_sparse(initial_blocks),
-            full_grid=self.full_structure
+            full_grid=self.full_structure,
+            last_instruction='\n'.join(self.dialog[tid])
         )
         # To properly init max_int and prev_grid_size fields
         task.reset()

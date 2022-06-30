@@ -1,18 +1,17 @@
 import pyglet
 import warnings
-
-pyglet.options["headless"] = True
-from gridworld.world import World
-from gridworld.control import Agent
+import os
+if os.environ.get('IGLU_HEADLESS', '1') == '1':
+    pyglet.options["headless"] = True
+from gridworld.core.world import Agent, World
 from gridworld.render import Renderer, setup
 from gridworld.tasks.task import Task, Tasks
 
 from gym.spaces import Dict, Box, Discrete, Space
-from gym import Env, Wrapper
+from gym import Env, Wrapper as gymWrapper
 import gym
 import numpy as np
 from copy import copy
-
 
 class String(Space):
     def __init__(self, ):
@@ -25,14 +24,19 @@ class String(Space):
         return isinstance(obj, str)
 
 
+class Wrapper(gymWrapper):
+    def __getattr__(self, name):
+        return getattr(self.env, name)
+
+
 class GridWorld(Env):
     def __init__(
             self, render=True, max_steps=250, select_and_place=False,
             discretize=False, right_placement_scale=1., wrong_placement_scale=0.1,
             render_size=(64, 64), target_in_obs=False,
             vector_state=True, name='') -> None:
+        self.agent = Agent(sustain=False)
         self.world = World()
-        self.agent = Agent(self.world, sustain=False)
         self.grid = np.zeros((9, 11, 11), dtype=np.int32)
         self._task = None
         self._task_generator = None
@@ -54,7 +58,6 @@ class GridWorld(Env):
         self.initial_position = (0, 0, 0)
         self.initial_rotation = (0, 0)
         if discretize:
-            self.parse = self.parse_low_level_action
             self.action_space = Discrete(18)
         else:
             self.action_space = Dict({
@@ -68,9 +71,8 @@ class GridWorld(Env):
                 'camera': Box(low=-5, high=5, shape=(2,)),
                 'hotbar': Discrete(7)
             })
-            self.parse = self.parse_action
         self.observation_space = {
-            'inventory': Box(low=0, high=190, shape=(6,), dtype=np.float32),
+            'inventory': Box(low=0, high=20, shape=(6,), dtype=np.float32),
             'compass': Box(low=-180, high=180, shape=(1,), dtype=np.float32),
             'dialog': String()
         }
@@ -172,8 +174,8 @@ class GridWorld(Env):
         if self._task is None:
             if self._task_generator is None:
                 raise ValueError('Task is not initialized! Initialize task before working with'
-                                 ' the environment using .set_task method OR set tasks distribution using '
-                                 '.set_task_generator method')
+                                ' the environment using .set_task method OR set tasks distribution using '
+                                '.set_task_generator method')
             self._task = self._task_generator.reset()
             self.starting_grid = self._task.starting_grid
         return self._task
@@ -182,8 +184,8 @@ class GridWorld(Env):
         if self._task is None:
             if self._task_generator is None:
                 raise ValueError('Task is not initialized! Initialize task before working with'
-                                 ' the environment using .set_task method OR set tasks distribution using '
-                                 '.set_task_generator method')
+                                ' the environment using .set_task method OR set tasks distribution using '
+                                '.set_task_generator method')
             else:
                 # yield new task
                 self._task = self._task_generator.reset()
@@ -198,13 +200,13 @@ class GridWorld(Env):
         for block in set(self.world.placed):
             self.world.remove_block(block)
         if self.starting_grid is not None:
-            for x, y, z, bid in self.starting_grid:
+            for x,y,z, bid in self.starting_grid:
                 self.world.add_block((x, y, z), bid)
         self.agent.position = self.initial_position
         self.agent.rotation = self.initial_rotation
         self.max_int = self._task.maximal_intersection(self.grid)
         self.prev_grid_size = len(self.grid.nonzero()[0])
-        self.agent.inventory = [190 for _ in range(6)]
+        self.agent.inventory = [20 for _ in range(6)]
         if self.starting_grid is not None:
             for _, _, _, color in self.starting_grid:
                 self.agent.inventory[color - 1] -= 1
@@ -222,13 +224,13 @@ class GridWorld(Env):
             obs['pov'] = self.render()[..., :-1]
         return obs
 
-    def render(self, ):
+    def render(self,):
         if not self.do_render:
             raise ValueError('create env with render=True')
         return self.renderer.render()
 
     def parse_action(self, action):
-        strafe = [0, 0]
+        strafe = [0,0]
         if action['forward']:
             strafe[0] += -1
         if action['back']:
@@ -247,69 +249,21 @@ class GridWorld(Env):
         add = bool(action['use'])
         return strafe, jump, inventory, camera, remove, add
 
-    def parse_low_level_action(self, action):
-        # 0 noop; 1 forward; 2 back; 3 left; 4 right; 5 jump; 6-11 hotbar; 12 camera left;
-        # 13 camera right; 14 camera up; 15 camera down; 16 attack; 17 use;
-        # action = list(action).index(1)
-        strafe = [0, 0]
-        camera = [0, 0]
-        jump = False
-        inventory = None
-        remove = False
-        add = False
-        if action == 1:
-            strafe[0] += -1
-        elif action == 2:
-            strafe[0] += 1
-        elif action == 3:
-            strafe[1] += -1
-        elif action == 4:
-            strafe[1] += 1
-        elif action == 5:
-            jump = True
-        elif 6 <= action <= 11:
-            inventory = action - 5
-        elif action == 12:
-            camera[0] = -5
-        elif action == 13:
-            camera[0] = 5
-        elif action == 14:
-            camera[1] = -5
-        elif action == 15:
-            camera[1] = 5
-        elif action == 16:
-            remove = True
-        elif action == 17:
-            add = True
-        return strafe, jump, inventory, camera, remove, add
-
     def step(self, action):
         if self._task is None:
             if self._task_generator is None:
                 raise ValueError('Task is not initialized! Initialize task before working with'
-                                 ' the environment using .set_task method OR set tasks distribution using '
-                                 '.set_task_generator method')
+                                ' the environment using .set_task method OR set tasks distribution using '
+                                '.set_task_generator method')
             else:
                 raise ValueError('Task is not initialized! Run .reset() first.')
         self.step_no += 1
-        strafe, jump, inventory, camera, remove, add = self.parse(action)
-        if self.select_and_place and inventory is not None:
-            add = True
-            remove = False
-        self.agent.movement(strafe=strafe, jump=jump, inventory=inventory)
-        self.agent.move_camera(*camera)
-        self.agent.place_or_remove_block(remove=remove, place=add)
-        self.agent.update(dt=1 / 20.)
+        self.world.step(self.agent, action, select_and_place=self.select_and_place)
         x, y, z = self.agent.position
         yaw, pitch = self.agent.rotation
-        while yaw > 360.:
-            yaw -= 360.
-        while yaw < 0.0:
-            yaw += 360.0
-        self.agent.rotation = (yaw, pitch)
         obs = {}
         obs['inventory'] = np.array(copy(self.agent.inventory), dtype=np.float32)
-        obs['compass'] = np.array([yaw - 180., ], dtype=np.float32)
+        obs['compass'] = np.array([yaw - 180.,], dtype=np.float32)
         obs['dialog'] = self._task.chat
         if self.vector_state:
             obs['grid'] = self.grid.copy().astype(np.int32)
@@ -328,50 +282,49 @@ class GridWorld(Env):
 
 
 class SizeReward(Wrapper):
-    def __init__(self, env):
-        super().__init__(env)
-        self.size = 0
+  def __init__(self, env):
+    super().__init__(env)
+    self.size = 0
 
-    def reset(self):
-        self.size = 0
-        return super().reset()
+  def reset(self):
+    self.size = 0
+    return super().reset()
 
-    def step(self, action):
-        obs, reward, done, info = super().step(action)
-        intersection = self.unwrapped.max_int
-        reward = max(intersection, self.size) - self.size
-        self.size = max(intersection, self.size)
-        reward += min(self.unwrapped.wrong_placement * 0.02, 0)
-        return obs, reward, done, info
+  def step(self, action):
+    obs, reward, done, info = super().step(action)
+    intersection = self.unwrapped.max_int
+    reward = max(intersection, self.size) - self.size
+    self.size = max(intersection, self.size)
+    reward += min(self.unwrapped.wrong_placement * 0.02, 0)
+    return obs, reward, done, info
 
 
 def create_env(
         render=True, discretize=True, size_reward=True, select_and_place=True,
         right_placement_scale=1, render_size=(64, 64), target_in_obs=False,
-        vector_state=False,
+        vector_state=False, max_steps=250,
         wrong_placement_scale=0.1, name=''
-):
+    ):
     env = GridWorld(
         render=render, select_and_place=select_and_place,
         discretize=discretize, right_placement_scale=right_placement_scale,
         wrong_placement_scale=wrong_placement_scale, name=name,
         render_size=render_size, target_in_obs=target_in_obs,
-        vector_state=vector_state,
+        vector_state=vector_state, max_steps=max_steps,
     )
     if size_reward:
         env = SizeReward(env)
     # env = Actions(env)
     return env
 
-
 gym.envs.register(
-    id='IGLUGW-v0',
-    entry_point='gridworld.env:create_env',
-    kwargs={}
+     id='IGLUGridworld-v0',
+     entry_point='gridworld.env:create_env',
+     kwargs={}
 )
 
 gym.envs.register(
-    id='IGLUGridworldVector-v0',
-    entry_point='gridworld.env:create_env',
-    kwargs={'vector_state': True}
+     id='IGLUGridworldVector-v0',
+     entry_point='gridworld.env:create_env',
+     kwargs={'vector_state': True, 'render': False}
 )
