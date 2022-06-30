@@ -8,19 +8,19 @@ from sample_factory.envs.env_registry import global_env_registry
 
 from gridworld.env import GridWorld
 from models.models import ResnetEncoderWithTarget
-from visual import Visual
 from wrappers.common_wrappers import VectorObservationWrapper, \
     Discretization, flat_action_space, ColorWrapper, JumpAfterPlace
 from wrappers.loggers import VideoLogger
 from wrappers.multitask import SubtaskGenerator, TargetGenerator
 from wrappers.reward_wrappers import RangetRewardFilledField
 from wrappers.target_generator import DatasetFigure
+from gridworld.tasks.task import Task
 
 
 def make_iglu(*args, **kwargs):
     custom_grid = np.ones((9, 11, 11))
-    env = GridWorld(custom_grid, render=True, select_and_place=True, max_steps=2050)
-    env = Visual(env)  #
+    env = GridWorld(custom_grid, render=True, select_and_place=True, discretize=True, max_steps=2050)
+    env.set_task(Task("", custom_grid))  #
 
     figure_generator = DatasetFigure
     env = TargetGenerator(env, fig_generator=figure_generator)

@@ -36,14 +36,14 @@ class FakeObsWrapper(gym.ObservationWrapper):
 
 def make_iglu(*args, **kwargs):
     custom_grid = np.ones((9, 11, 11))
-    env = GridWorld(render=False, select_and_place=True, max_steps=1000)
+    env = GridWorld(render=False, select_and_place=True, discretize=True, max_steps=1000)
     env.set_task(Task("", custom_grid))
     #env = FakeObsWrapper(env)
     figure_generator = RandomFigure
     env = TargetGenerator(env, fig_generator=figure_generator)
     env = SubtaskGenerator(env)
     env = VectorObservationWrapper(env)
-    env = Discretization(env, flat_action_space('human-level'))
+   # env = Discretization(env, flat_action_space('human-level'))
     env = JumpAfterPlace(env)
     env = RangetRewardFilledField(env)
     env = Closeness(env)
