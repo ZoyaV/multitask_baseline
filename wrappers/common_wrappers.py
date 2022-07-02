@@ -62,7 +62,6 @@ class ObsWrapper(Wrapper):
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
-        print(obs.keys())
         info['grid'] = obs['grid']
         info['agentPos'] = obs['agentPos']
         info['obs'] = obs['pov']
@@ -153,7 +152,6 @@ class ColorWrapper(ActionsWrapper):
         tcolor = np.sum(self.env.task.target_grid)
         if (action > self.color_space[0]) and (action < self.color_space[1]) and tcolor > 0:
             action = int(self.color_space[0] + tcolor)
-            print(action)
         yield action
 
 
@@ -186,7 +184,7 @@ class VectorObservationWrapper(ObsWrapper):
             if 'target_grid' in info:
                 target_grid = self.env.task.target_grid
             else:
-                #logger.error(f'info: {info}')
+                # logger.error(f'info: {info}')
                 if hasattr(self.unwrapped, 'should_reset'):
                     self.unwrapped.should_reset(True)
                 target_grid = self.env.task.target_grid
