@@ -3,9 +3,10 @@ from pyglet.graphics import vertex_list
 from pyglet.gl import *
 
 from .render import Renderer
-
+import os
 from gridworld.core.world import Agent, World
 
+os.environ["IGLU_HEADLESS"]='0'
 
 class Viewer(Renderer):
     def __init__(self, *args, overlay=True, **kwargs) -> None:
@@ -17,7 +18,11 @@ class Viewer(Renderer):
         self.num_keys = [
             key._1, key._2, key._3, key._4, key._5,
             key._6, key._7, key._8, key._9, key._0]
-        self.reticle = None
+        x, y = self.width // 2, self.height // 2
+        n = 10
+        self.reticle = vertex_list(4,
+                                   ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n))
+                                   )
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called when a mouse button is pressed. See pyglet docs for button
@@ -43,7 +48,7 @@ class Viewer(Renderer):
                 self.world.place_or_remove_block(self.agent, remove=left_click, place=right_click)
         else:
             self.set_exclusive_mouse(True)
-    
+
     def on_mouse_motion(self, x, y, dx, dy):
         """ Called when the player moves the mouse.
 
@@ -124,7 +129,7 @@ class Viewer(Renderer):
         elif symbol == key.D:
             strafe[1] -= 1
         self.world.movement(self.agent, strafe, jump=False, inventory=None)
-    
+
     def on_resize(self, width, height):
         """ Called when the window is resized to a new `width` and `height`.
 
@@ -137,5 +142,5 @@ class Viewer(Renderer):
         x, y = self.width // 2, self.height // 2
         n = 10
         self.reticle = vertex_list(4,
-            ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n))
-        )
+                                   ('v2i', (x - n, y, x + n, y, x, y - n, x, y + n))
+                                   )

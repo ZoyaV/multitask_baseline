@@ -132,6 +132,7 @@ class VideoLogger(Wrapper):
         self.filename = None
         self.running_reward = 0
         self.actions = []
+        self.size = 512
         self.flushed = False
         self.new_session = True
         self.add_to_name = ''
@@ -163,7 +164,7 @@ class VideoLogger(Wrapper):
             self.frames = []
             self.obs = []
             self.out = cv2.VideoWriter(f'{self.filename}.mp4', cv2.VideoWriter_fourcc(*'mp4v'),
-                                       20, (self.env.size, self.env.size))
+                                       20, (self.size, self.size))
             self.new_session = False
 
     def reset(self):
@@ -187,9 +188,9 @@ class VideoLogger(Wrapper):
         self.actions.append(action)
         #   print((obs))
         if 'obs' in obs:
-            image = np.transpose(obs['obs'], (0, 1, 2)) * 255
+            image = obs['obs']  #np.transpose(obs['obs'], (0, 1, 2)) * 255
         elif 'obs' in info:
-            image = info['obs'] * 255
+            image = info['obs']
         self.add_to_name = info['done']
         font = cv2.FONT_HERSHEY_SIMPLEX  # org
         org = (8, 8)  # fontScale
@@ -247,11 +248,12 @@ class VideoLogger(Wrapper):
         return obs, reward, done, info
 
 
+
 class Logger(Wrapper):
     def __init__(self, env):
         super().__init__(env)
         runtime = timestamp = datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
-        self.dirname = f'action_logs/run-{runtime}'
+        self.dirname = f'action_logss/run-{runtime}'
         self.filename = None
         self.running_reward = 0
         self.actions = []
@@ -260,11 +262,12 @@ class Logger(Wrapper):
 
     def flush(self):
         if self.filename is not None:
-            with open(f'{self.filename}-act.pkl', 'wb') as f:
+            with open(f'{self.filename}-{self.env.figure.figure_parametrs["name"]}-act.pkl', 'wb') as f:
                 pickle.dump(self.actions, f)
-            with open(f'{self.filename}-obs.pkl', 'wb') as f:
+            with open(f'{self.filename}-{self.env.figure.figure_parametrs["name"]}-obs.pkl', 'wb') as f:
                 pickle.dump(self.obs, f)
             self.obs = []
+
         timestamp = datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
         uid = str(uuid.uuid4().hex)
         name = f'episode-{timestamp}-{uid}'
