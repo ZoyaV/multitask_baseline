@@ -10,7 +10,7 @@ from gridworld.env import GridWorld
 from models.models import ResnetEncoderWithTarget
 from wrappers.common_wrappers import VectorObservationWrapper, \
     Discretization, flat_action_space, ColorWrapper, JumpAfterPlace
-from wrappers.loggers import VideoLogger
+from wrappers.loggers import VideoLogger, Logger
 from wrappers.multitask import SubtaskGenerator, TargetGenerator
 from wrappers.reward_wrappers import RangetRewardFilledField
 from wrappers.target_generator import DatasetFigure
@@ -19,18 +19,20 @@ from gridworld.tasks.task import Task
 
 def make_iglu(*args, **kwargs):
     custom_grid = np.ones((9, 11, 11))
-    env = GridWorld(custom_grid, render=True, select_and_place=True, discretize=True, max_steps=2050)
+    env = GridWorld(render=True, select_and_place=True, discretize=True, max_steps=1000,render_size=(512, 512))
     env.set_task(Task("", custom_grid))  #
 
     figure_generator = DatasetFigure
+    figure_generator.main_figure = 80
     env = TargetGenerator(env, fig_generator=figure_generator)
     env = SubtaskGenerator(env)
     env = VectorObservationWrapper(env)
-    env = Discretization(env, flat_action_space('human-level'))
+    #env = Discretization(env, flat_action_space('human-level'))
     env = JumpAfterPlace(env)
     env = ColorWrapper(env)
     env = RangetRewardFilledField(env)
     env = VideoLogger(env)
+    env = Logger(env)
     return env
 
 
