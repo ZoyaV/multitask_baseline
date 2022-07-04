@@ -80,4 +80,4 @@ RUN pip3 install --upgrade pip && \
 ENV PYOPENGL_PLATFORM=egl
 ENV MUJOCO_GL=egl
 RUN pip3 install git+https://github.com/iglu-contest/gridworld.git@segments
-RUN pip3 install git+https://github.com/iglu-contest/sample-factory.git
+RUN pip3 install sample_factory==1.121.3
