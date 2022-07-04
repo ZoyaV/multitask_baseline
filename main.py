@@ -11,7 +11,7 @@ from utils.config_validation import Experiment
 from utils.gs2dict import generate_variants
 import yaml
 
-
+import torch
 def start_training_runs(config_path):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
@@ -58,4 +58,5 @@ def main():
 
 
 if __name__ == '__main__':
+    torch.multiprocessing.set_start_method('spawn')
     main()
