@@ -49,6 +49,14 @@ python utils/enjoy.py
 
 
 ## Per-skill aggregation of the baselines performance metrics. 
+Instead of evaluating a metric for each structure in the dataset, we evaluate the agent's skills required to build each structure.
+There are 5 skills in total:
+  * `flat` - flat structure with all blocks on the ground
+  * `flying` - there are blocks that cannot be placed without removing some other blocks (i.e. )
+  * `diagonal` - some blocks are adjacent (in vertical axis) diagonally
+  * `tricky` - some blocks are hidden or there should be a specific order in which they should be placed
+  * `tall` - a structure cannot be built without the agent being high enough (the placement radius is 3 blocks)
+  
 For each task, we calculate F1 score between built and target structures. 
 For each skill, we average the performance on all targets requiring that skill.
 
