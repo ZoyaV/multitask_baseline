@@ -7,7 +7,7 @@ module, and a subtask solving module. We define the subtask as an episode
 of adding or removing a single cube. It allows us to train an agent with a dense reward signal in
 episodes with a short horizon.
 
-**Task generator module** generate full target(3D voxel) figure using dialogue with person. For training we devlop; For training we use randomly generated compact structures as tasks.
+**Task generator module** generate full target(3D voxel) figure using dialogue with person. For training we use randomly generated compact structures as tasks.
 
 **Subtask generator** receives a 3D voxel as input and outputs a sequence of subgoals (remove or install one cube) in a certain sequence (left to right, bottom to top);
 
