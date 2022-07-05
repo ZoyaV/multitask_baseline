@@ -2,10 +2,10 @@
 
 
 ## Installation
-For this baseline version uses branch ```for_baseline``` from Iglu gridworld repository. You can install this version by the following command:
+For this baseline version uses branch ```segments``` from Iglu gridworld repository. You can install this version by the following command:
 
 ```bash
-pip install git+https://github.com/iglu-contest/gridworld.git@for_baseline
+pip install git+https://github.com/iglu-contest/gridworld.git@segments
 ```
 
 Just install all dependencies using:
@@ -23,6 +23,9 @@ Run ```enjoy.py``` :
 ```bash
 python utils/enjoy.py
 ```
+## Idea
+
+![Baseline job example](https://github.com/ZoyaV/multitask_baseline/raw/master/example.gif)
 
 ## Per-skill aggregation of the baselines performance metrics. 
 For each task, we calculate F1 score between built and target structures. 
