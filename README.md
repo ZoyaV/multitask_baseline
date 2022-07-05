@@ -24,8 +24,10 @@ Run ```enjoy.py``` :
 python utils/enjoy.py
 ```
 ## Idea
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![Baseline job example](https://github.com/ZoyaV/multitask_baseline/raw/master/original.png) |  ![Baseline job example](https://github.com/ZoyaV/multitask_baseline/raw/master/example.gif)
 
-![Baseline job example](https://github.com/ZoyaV/multitask_baseline/raw/master/example.gif)
 
 ## Per-skill aggregation of the baselines performance metrics. 
 For each task, we calculate F1 score between built and target structures. 
