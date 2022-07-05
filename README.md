@@ -1,11 +1,9 @@
 # SampleFactory APPO baseline for Iglu
 
 ## Idea
-There are many ways to build a structure in IGLU environment. To overcome this, we split the whole
-system from the agents’ perspective into three modules: a task generator module, a subtask generator
-module, and a subtask solving module. We define the subtask as an episode
-of adding or removing a single cube. It allows us to train an agent with a dense reward signal in
-episodes with a short horizon.
+Training an agent to build any language-defined structure is a challenging task. To overcome this, we have developed
+a multitask hierarchical builder (MHB) with three modules: task generator (NLP part), subtask generator (heuristic
+part), and subtask solving module (RL part). We define the subtask as an episode of adding or removing a single cube. It allows us to train an agent with a dense reward signal in episodes with a short horizon.
 
 **Task generator module** generate full target(3D voxel) figure using dialogue with person. For training we use randomly generated compact structures as tasks.
 
